@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "project1-shilenko-nikolay-m25-555"
+version = "0.1.0"
+description = "Тема 7/11: Домашнее задание №1. Текстовая приключенческая игра \"Лабиринт сокровищ\""
+authors = ["Nikolay Shilenko <shilenko.nikolay@yandex.ru>"]
+readme = "README.md"
+packages = [
+    { include = "labyrinth_game" },
+]
+[tool.poetry.dependencies]
+python = ">=3.13"
+[tool.poetry.scripts]
+project = "labyrinth_game.main:main" 
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
