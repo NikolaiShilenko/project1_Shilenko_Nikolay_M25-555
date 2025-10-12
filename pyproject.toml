@@ -7,11 +7,12 @@ readme = "README.md"
 packages = [
     { include = "labyrinth_game" },
 ]
+
 [tool.poetry.dependencies]
 python = ">=3.13"
+
 [tool.poetry.scripts]
 project = "labyrinth_game.main:main" 
-
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
