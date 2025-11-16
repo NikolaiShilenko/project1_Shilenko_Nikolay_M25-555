@@ -55,3 +55,31 @@ def pseudo_random(seed, modulo):
     return math.floor(fractional_part * modulo)
 
 
+def trigger_trap(game_state):
+    """Активация ловушки с негативными последствиями для игрока
+
+    Args:
+        game_state (dict): текущее состояние игры
+    """
+    print("Ловушка активирована! Пол стал дрожать...")
+
+    inventory = game_state['player_inventory']
+
+    # Проверяем есть ли предметы в инвентаре
+    if inventory:
+        # Выбираем случайный предмет для удаления
+        random_index = pseudo_random(game_state['steps_taken'], len(inventory))
+        lost_item = inventory.pop(random_index)
+        print(f"Из вашего инвентаря выпал и потерялся: {lost_item}")
+
+    else:
+        # Инвентарь пуст - игрок получает "урон"
+        damage_chance = pseudo_random(game_state['steps_taken'], 10)
+
+        if damage_chance < 3:  # 30% шанс проигрыша
+            print("Каменная плита с грохотом обрушивается на вас! Игра окончена.")
+            game_state['game_over'] = True
+        else:
+            print("Вам удалось увернуться от падающих камней! Вы уцелели.")
+
+
