@@ -6,11 +6,12 @@ from .utils import attempt_open_treasure, describe_current_room, solve_puzzle
 
 # Состояние игрока и игры
 game_state = {
-    'player_inventory': [],  # Инвентарь игрока
-    'current_room': 'entrance',  # Текущая комната
-    'game_over': False,  # Флаг окончания игры
-    'steps_taken': 0,  # Количество шагов
-    'rooms': ROOMS  # Добавляем комнаты в game_state
+    'player_inventory': {},
+    'current_room': 'entrance',
+    'game_over': False,
+    'steps_taken': 0,
+    'rooms': ROOMS,
+    'item_locations': {}
 }
 
 
@@ -39,7 +40,6 @@ def process_command(command, game_state):
 
     elif command in ['север', 'north', 'юг', 'south',
                      'запад', 'west', 'восток', 'east']:
-        # Преобразуем русские направления в английские
         direction_map = {
             'север': 'north', 'north': 'north',
             'юг': 'south', 'south': 'south',
@@ -53,6 +53,11 @@ def process_command(command, game_state):
             attempt_open_treasure(game_state)
         else:
             solve_puzzle(game_state)
+
+    elif command.startswith('взять ') or command.startswith('take '):
+        item = command.split(' ', 1)[1]
+        from .player_actions import pick_up_item
+        pick_up_item(game_state, item)
 
     else:
         print("Неизвестная команда. Введите 'помощь' для списка команд.")

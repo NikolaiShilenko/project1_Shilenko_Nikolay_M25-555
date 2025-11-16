@@ -1,9 +1,14 @@
 def show_inventory(game_state):
-    """Отображение инвентаря игрока"""
     inventory = game_state['player_inventory']
 
     if inventory:
-        print("Ваш инвентарь:", ", ".join(inventory))
+        items_display = []
+        for item, count in inventory.items():
+            if item == 'coin' and count > 1:
+                items_display.append(f"{count}x {item}")
+            else:
+                items_display.append(item)
+        print("Ваш инвентарь:", ", ".join(items_display))
     else:
         print("Ваш инвентарь пуст")
 
@@ -59,4 +64,35 @@ def move_player(game_state, direction):
         return True
     else:
         print(f"Невозможно переместиться {direction}.")
+        return False
+
+
+def pick_up_item(game_state, item_name):
+    """Подбор предмета из текущей комнаты"""
+    current_room = game_state['current_room']
+    room_items = game_state['rooms'][current_room]['items']
+
+    # Запрещаем подбор сундука
+    if item_name == 'treasure_chest':
+        print("Вы не можете поднять сундук, он слишком тяжелый.")
+        return False
+
+    if item_name in room_items:
+        # Для монет используем счетчик, остальные предметы уникальны
+        inventory = game_state['player_inventory']
+        if item_name == 'coin':
+            if 'coin' in inventory:
+                inventory['coin'] += 1
+            else:
+                inventory['coin'] = 1
+        else:
+            # Уникальные предметы просто добавляем
+            inventory[item_name] = 1
+
+        game_state['item_locations'][item_name] = current_room
+        room_items.remove(item_name)
+        print(f"Вы подобрали: {item_name}")
+        return True
+    else:
+        print(f"Предмет '{item_name}' не найден в этой комнате.")
         return False
