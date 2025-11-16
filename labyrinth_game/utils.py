@@ -120,3 +120,66 @@ def random_event(game_state):
         else:
             print("Показалось, что что-то щёлкнуло, но ничего не произошло.")
 
+
+def solve_puzzle(game_state):
+    """Решение загадки в текущей комнате"""
+    current_room_name = game_state['current_room']
+    room_data = game_state['rooms'][current_room_name]
+
+    if room_data['puzzle'] is None:
+        print("Здесь нет загадки для решения.")
+        return
+
+    puzzle_text, correct_answer, *alternative_answers = room_data['puzzle']
+
+    # Создаем список всех допустимых ответов
+    all_answers = [correct_answer]
+    if alternative_answers:
+        all_answers.extend(alternative_answers[0])
+
+    print(f"Загадка: {puzzle_text}")
+    user_answer = input("Ваш ответ: ").strip().lower()
+
+    if user_answer in all_answers:
+        print("Правильно! Загадка решена.")
+
+        # Награда в зависимости от комнаты
+        if current_room_name == 'hall':
+            print("Пьедестал открывается! Вы получаете серебряный ключ.")
+            game_state['player_inventory'].append('silver_key')
+        elif current_room_name == 'trap_room':
+            print("Плиты перестали двигаться! "
+                  "Теперь вы можете безопасно исследовать комнату.")
+            # Можно добавить специальный предмет или изменить состояние комнаты
+        elif current_room_name == 'library':
+            print("Свиток раскрывается! Вы находите скрытый отсек с картой.")
+            game_state['player_inventory'].append('secret_map')
+        elif current_room_name == 'observatory':
+            print("Телескоп настраивается! Теперь вы можете видеть звезды лучше.")
+            game_state['player_inventory'].append('enhanced_telescope')
+
+        # Убираем загадку после решения
+        room_data['puzzle'] = None
+
+    else:
+        print("Неправильный ответ. Попробуйте еще раз.")
+
+        # Особое поведение для trap_room при неверном ответе
+        if current_room_name == 'trap_room':
+            print("Ловушка активируется!")
+            trigger_trap(game_state)
+
+
+def attempt_open_treasure(game_state):
+    """Попытка открыть сундук с сокровищами"""
+    if game_state['current_room'] != 'treasure_room':
+        print("Здесь нет сундука с сокровищами.")
+        return
+
+    if 'rusty_key' not in game_state['player_inventory']:
+        print("Сундук заперт. Нужен ключ, чтобы открыть его.")
+        return
+
+    print("Вы используете ключ, чтобы открыть сундук с сокровищами!")
+    print("🎉 ПОЗДРАВЛЯЕМ! Вы нашли сокровища и выиграли игру! 🎉")
+    game_state['game_over'] = True
