@@ -129,35 +129,88 @@ def solve_puzzle(game_state):
 
     normalized_answers = [normalize_answer(ans) for ans in all_answers]
 
-    print(f"Загадка: {puzzle_text}")
-    user_answer = input("Ваш ответ: ").strip()
+    # Особый сценарий для trap_room
+    if current_room_name == 'trap_room':
+        print("Ловушка активирована! Плиты под ногами начали дрожать...")
+        print(f"Испытание: {puzzle_text}")
 
-    normalized_user_answer = normalize_answer(user_answer)
+        # Первая попытка
+        user_answer = input("Ваш ответ: ").strip()
+        normalized_user_answer = normalize_answer(user_answer)
 
-    if normalized_user_answer in normalized_answers:
-        print("Правильно! Загадка решена.")
+        if normalized_user_answer in normalized_answers:
+            print("Правильно! Вы получаете защитный амулет")
+            print("Плиты перестали двигаться. Вы в безопасности!")
+            game_state['player_inventory']['protective_amulet'] = 1
+            room_data['puzzle'] = None
+            return
 
-        inventory = game_state['player_inventory']
-        if current_room_name == 'hall':
-            print("Пьедестал открывается! Вы получаете ключ от сокровищ.")
-            inventory['treasure_key'] = 1
-        elif current_room_name == 'trap_room':
-            print("Плиты перестали двигаться! Теперь безопасно.")
-        elif current_room_name == 'library':
-            print("Свиток раскрывается! Вы находите скрытый отсек с картой.")
-            inventory['secret_map'] = 1
-        elif current_room_name == 'observatory':
-            print("Телескоп настраивается! Видите звезды лучше.")
-            inventory['enhanced_telescope'] = 1
+        # Вторая попытка
+        print("Неправильно! Плиты ускоряются! Срочно введите ответ!")
+        user_answer = input("Последний шанс: ").strip()
+        normalized_user_answer = normalize_answer(user_answer)
 
-        room_data['puzzle'] = None
+        if normalized_user_answer in normalized_answers:
+            print("Правильно! Вы получаете защитный амулет")
+            print("Плиты перестали двигаться. Вы в безопасности!")
+            game_state['player_inventory']['protective_amulet'] = 1
+            room_data['puzzle'] = None
+        else:
+            print("Неправильно! Плиты разъехались...")
+            print("💀GAME OVER💀")
+            game_state['game_over'] = True
 
     else:
-        print("Неправильный ответ. Попробуйте еще раз.")
+        # Обычные комнаты с потерей предмета при ошибке
+        print(f"Загадка: {puzzle_text}")
+        user_answer = input("Ваш ответ: ").strip()
+        normalized_user_answer = normalize_answer(user_answer)
 
-        if current_room_name == 'trap_room':
-            print("Ловушка активируется!")
-            trigger_trap(game_state)
+        if normalized_user_answer in normalized_answers:
+            print("Правильно! Загадка решена.")
+
+            # Награда в зависимости от комнаты
+            inventory = game_state['player_inventory']
+            if current_room_name == 'hall':
+                print("Пьедестал открывается! Вы получаете ключ от сокровищ.")
+                inventory['treasure_key'] = 1
+            elif current_room_name == 'library':
+                print("Свиток раскрывается! Вы находите часть карты лабиринта.")
+                inventory['maze_map'] = 1
+            elif current_room_name == 'orangery':
+                print("Дерево дарит вам ягоды, восстанавливающие здоровье!")
+                inventory['healing_berries'] = 1
+            elif current_room_name == 'observatory':
+                print("Телескоп настраивается! Вы видите вторую часть карты. "
+                      "Сокровище в treasure_room")
+                inventory['night_vision'] = 1
+
+            room_data['puzzle'] = None
+
+        else:
+            print("Неправильный ответ! От разочарования вы роняете предмет.")
+
+            # Потеря случайного предмета из инвентаря
+            inventory = game_state['player_inventory']
+            if inventory:
+                items_list = list(inventory.keys())
+                random_index = pseudo_random(game_state['steps_taken'], len(items_list))
+                lost_item = items_list[random_index]
+
+                if lost_item == 'coin' and inventory['coin'] > 1:
+                    inventory['coin'] -= 1
+                    print("Вы потеряли одну монетку!")
+                else:
+                    del inventory[lost_item]
+                    print(f"Из вашего инвентаря выпал: {lost_item}")
+
+                # Возвращаем предмет в оригинальную комнату
+                original_room = game_state['item_locations'].get(lost_item)
+                if original_room:
+                    game_state['rooms'][original_room]['items'].append(lost_item)
+                    print(f"Предмет {lost_item} вернулся в {original_room}.")
+            else:
+                print("Ваш инвентарь пуст, поэтому вы не потеряли ничего.")
 
 
 def attempt_open_treasure(game_state):
@@ -179,7 +232,8 @@ def attempt_open_treasure(game_state):
     print("Сундук заперт. Нет ключа, но есть кодовый замок. Ввести код? (да/нет)")
     choice = input("> ").strip().lower()
 
-    if choice == 'да':
+    # Принимаем да/yes и нет/no
+    if choice in ['да', 'yes']:
         puzzle_text = current_room['puzzle'][0]
         print(f"Код зашифрован в загадке: {puzzle_text}")
         print("Введите код:")
@@ -197,5 +251,7 @@ def attempt_open_treasure(game_state):
             game_state['game_over'] = True
         else:
             print("Неверный код. Замок не открылся.")
-    else:
+    elif choice in ['нет', 'no']:
         print("Вы отступаете от сундука.")
+    else:
+        print("Пожалуйста, введите 'да' или 'нет'.")

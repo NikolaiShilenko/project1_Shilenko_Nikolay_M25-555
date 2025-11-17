@@ -1,13 +1,13 @@
 ROOMS = {
     'entrance': {
         'description': 'Вы в темном входе лабиринта. Стены покрыты мхом.',
-        'exits': {'north': 'hall', 'east': 'trap_room'},
+        'exits': {'east': 'library', 'south': 'trap_room'},
         'items': ['torch'],
         'puzzle': None
     },
     'hall': {
         'description': 'Большой зал с эхом. По центру стоит пьедестал.',
-        'exits': {'south': 'entrance', 'west': 'library', 'north': 'treasure_room'},
+        'exits': {'west': 'armory', 'north': 'observatory'},
         'items': [],
         'puzzle': (
             'На пьедестале надпись: "Назовите число после девяти". '
@@ -17,18 +17,18 @@ ROOMS = {
         )
     },
     'trap_room': {
-        'description': 'Комната с плиточной поломкой. На стене надпись.',
-        'exits': {'west': 'entrance'},
+        'description': 'Комната исписанная древними символами. На полу странные плиты',
+        'exits': {'north': 'entrance', 'east': 'orangery'},
         'items': ['rusty_key'],
         'puzzle': (
-            'Система плит активна. Чтобы пройти, назовите слово "шаг" '
+            'Чтобы спастись, назовите слово "шаг" '
             'три раза подряд',
             'шагшагшаг'
         )
     },
     'library': {
         'description': 'Пыльная библиотека. На полках старые свитки.',
-        'exits': {'east': 'hall', 'north': 'armory'},
+        'exits': {'west': 'entrance', 'south': 'armory'},
         'items': ['ancient_book'],
         'puzzle': (
             'В свитке загадка: "Что принадлежит тебе, но другие '
@@ -38,17 +38,17 @@ ROOMS = {
         )
     },
     'armory': {
-        'description': 'Старая оружейная комната. На стене висит меч.',
-        'exits': {'south': 'library', 'west': 'orangery'},
+        'description': 'Старая оружейная комната. На стенах висит оружие.',
+        'exits': {'north': 'library', 'east': 'hall', 'south': 'treasure_room'},
         'items': ['sword', 'bronze_box'],
         'puzzle': None
     },
     'treasure_room': {
         'description': 'Комната с большим сундуком сокровищ.',
-        'exits': {'south': 'hall', 'east': 'observatory'},
+        'exits': {'north': 'armory'},
         'items': ['treasure_chest'],
         'puzzle': (
-            'Сколько будет: квадратный корень из 100?. '
+            'Сколько будет: квадратный корень из 100? '
             'Ответ цифрой или словом.',
             '10',
             ['10', 'десять']
@@ -57,7 +57,7 @@ ROOMS = {
     'orangery': {
         'description': 'Оранжерея с экзотическими растениями. '
                        'В центре растет золотое дерево.',
-        'exits': {'east': 'armory'},
+        'exits': {'west': 'trap_room', 'north': 'observatory'},
         'items': ['golden_tree', 'dried_spring', 'exotic_flowers'],
         'puzzle': (
             'Дерево шепчет: "В руках не удержать, в решете не унести. '
@@ -68,7 +68,7 @@ ROOMS = {
     },
     'observatory': {
         'description': 'Обсерватория с телескопом. На столе звездные карты.',
-        'exits': {'west': 'treasure_room'},
+        'exits': {'south': 'hall', 'west': 'orangery'},
         'items': ['star_map', 'telescope'],
         'puzzle': (
             'Карта показывает последовательность: 2, 4, 6, ? '
@@ -80,13 +80,12 @@ ROOMS = {
 }
 
 COMMANDS = {
-    "north/север": "перейти на север",
-    "south/юг": "перейти на юг",
-    "west/запад": "перейти на запад",
-    "east/восток": "перейти на восток",
-    "inventory/инвентарь": "показать инвентарь",
+    "go <direction>/идти <направление>": "перейти в направлении",
+    "look/осмотр": "осмотреть текущую комнату",
     "take <item>/взять <предмет>": "подобрать предмет",
+    "use <item>/использовать <предмет>": "использовать предмет",
     "solve/решить": "решить загадку",
+    "inventory/инвентарь": "показать инвентарь",
     "help/помощь": "показать справку по командам",
     "quit/выход": "выйти из игры"
 }
