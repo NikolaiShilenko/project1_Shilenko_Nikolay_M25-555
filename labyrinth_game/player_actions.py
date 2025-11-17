@@ -86,7 +86,6 @@ def pick_up_item(game_state, item_name):
             else:
                 inventory['coin'] = 1
         else:
-            # Уникальные предметы просто добавляем
             inventory[item_name] = 1
 
         game_state['item_locations'][item_name] = current_room
@@ -96,3 +95,33 @@ def pick_up_item(game_state, item_name):
     else:
         print(f"Предмет '{item_name}' не найден в этой комнате.")
         return False
+
+
+def use_item(game_state, item_name):
+    """Использование предмета из инвентаря"""
+    inventory = game_state['player_inventory']
+
+    if item_name not in inventory:
+        print(f"У вас нет предмета '{item_name}'.")
+        return False
+
+    match item_name:
+        case "torch":
+            print("Вы зажигаете факел. Стало светлее и уютнее.")
+
+        case "sword":
+            print("Вы размахиваете мечом. Чувствуете себя увереннее.")
+
+        case "bronze_box":
+            print("Вы открываете бронзовую шкатулку.")
+            if 'rusty_key' not in inventory:
+                inventory['rusty_key'] = 1
+                print("Внутри вы находите rusty_key!")
+            else:
+                print("Шкатулка пуста.")
+
+        case _:
+            print(f"Вы не знаете, как использовать {item_name}.")
+            return False
+
+    return True

@@ -5,7 +5,7 @@ install:
 
 # Запуск игры через Poetry.
 # Использует виртуальное окружение проекта для гарантии правильных зависимостей.
-# 'project' - это имя консольной команды, определенной в pyproject.toml в секции [tool.poetry.scripts].
+# 'project' - это имя консольной команды, определенной в pyproject.toml в секции [project.scripts].
 project:
 	poetry run project
 
